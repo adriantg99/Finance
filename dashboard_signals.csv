@@ -1,0 +1,2 @@
+symbol,strategy,probability,risk,avg_return,max_loss,samples,current_price,rsi
+GOOGL,Rebote Bollinger,75.43859649122807,5.121185895826468,3.8670000294647795,-19.35050293581616,57,307.2900085449219,24.159218458963437

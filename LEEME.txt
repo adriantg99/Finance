@@ -1,0 +1,166 @@
+================================================================================
+                    PROYECTO: ANALIZADOR DE ACCIONES
+================================================================================
+
+OBJETIVO:
+   Encontrar oportunidades de compra en el mercado de valores basandose en
+   probabilidades historicas y analisis tecnico.
+
+================================================================================
+ARCHIVOS CREADOS (9 archivos):
+================================================================================
+
+PRINCIPALES:
+  1. inicio_rapido.py           - Tutorial guiado (EMPIEZA AQUI)
+  2. buscar_acciones.py         - Analisis rapido diario
+  3. dashboard.py               - Vista general del mercado
+  4. stock_analyzer.py          - Motor principal (30+ acciones)
+
+CONFIGURACION Y EJEMPLOS:
+  5. config.py                  - Configuracion personalizable
+  6. analizar_personalizado.py - Usa tu config personalizada
+  7. ejemplos_avanzados.py     - 7 ejemplos interactivos
+
+DOCUMENTACION:
+  8. README_STOCKS.md           - README del proyecto
+  9. GUIA_COMPLETA.md           - Guia detallada de uso
+
+================================================================================
+CARACTERISTICAS PRINCIPALES:
+================================================================================
+
+   * Analiza multiples acciones simultaneamente
+   * 5 estrategias de trading diferentes
+   * Calcula probabilidad historica de exito
+   * Evalua riesgo de cada operacion
+   * Genera recomendaciones claras y accionables
+   * Exporta resultados a CSV
+   * Perfiles predefinidos (conservador, moderado, agresivo)
+   * Completamente personalizable
+
+================================================================================
+5 ESTRATEGIAS IMPLEMENTADAS:
+================================================================================
+
+   1. RSI Sobrevendido       - Detecta acciones caidas con potencial
+   2. Cruce Dorado           - Cambio de tendencia bajista a alcista
+   3. MACD Alcista           - Momentum ascendente fuerte
+   4. Rebote Bollinger       - Rebotes en soportes tecnicos
+   5. Momentum Fuerte        - Tendencias alcistas consolidadas
+
+================================================================================
+EJEMPLO DE SALIDA:
+================================================================================
+
+   1. GOOGL - Estrategia: Rebote Bollinger
+      ================================================================
+      Segun esta estrategia, GOOGL tiene 75% probabilidad historica
+      de subir en los proximos 15 dias, con un riesgo del 5.1%.
+
+      Detalles:
+         * Precio actual: $307.17
+         * RSI: 24.1
+         * Retorno promedio esperado: 3.87%
+         * Perdida maxima historica: -19.35%
+         * Muestras historicas: 57
+
+      >> COMPRA FUERTE
+
+================================================================================
+INICIO RAPIDO (3 PASOS):
+================================================================================
+
+   1. Instalar dependencias:
+      pip install yfinance pandas numpy
+
+   2. Ejecutar primer analisis:
+      python inicio_rapido.py
+
+   3. Personalizar y usar:
+      python buscar_acciones.py
+
+================================================================================
+CASOS DE USO:
+================================================================================
+
+   * Analisis Diario Rapido
+     -> python buscar_acciones.py (1 minuto)
+
+   * Vista General del Mercado
+     -> python dashboard.py (3-5 minutos)
+
+   * Analisis Personalizado
+     -> Edita config.py + ejecuta analizar_personalizado.py
+
+   * Explorar y Aprender
+     -> python ejemplos_avanzados.py (menu interactivo)
+
+================================================================================
+PERFILES PREDEFINIDOS:
+================================================================================
+
+   CONSERVADOR      Prob >=70%, Riesgo <10%  (Seguridad)
+   MODERADO         Prob >=60%, Riesgo <15%  (Balance)
+   AGRESIVO         Prob >=55%, Riesgo <20%  (Alto retorno)
+   DAY TRADER       Prob >=65%, Riesgo <12%  (Corto plazo)
+
+================================================================================
+INDICADORES TECNICOS USADOS:
+================================================================================
+
+   * RSI (Relative Strength Index)
+   * Medias Moviles (MA20, MA50, MA200)
+   * MACD (Moving Average Convergence Divergence)
+   * Bandas de Bollinger
+   * Volatilidad historica
+
+================================================================================
+ARCHIVOS GENERADOS:
+================================================================================
+
+   * mis_recomendaciones.csv    - Tus analisis personalizados
+   * dashboard_signals.csv      - Analisis del dashboard
+   * recomendaciones.csv        - Analisis completo
+
+================================================================================
+ADVERTENCIAS IMPORTANTES:
+================================================================================
+
+   ! Este sistema NO es asesoria financiera
+   ! Los resultados pasados NO garantizan resultados futuros
+   ! Solo invierte lo que puedas perder
+   ! Siempre investiga antes de comprar
+   ! Usa stop-loss y gestiona tu riesgo
+   ! Diversifica tu portafolio
+
+================================================================================
+RECURSOS ADICIONALES:
+================================================================================
+
+   * Lee README_STOCKS.md        - Introduccion al proyecto
+   * Lee GUIA_COMPLETA.md        - Guia paso a paso detallada
+   * Ejecuta ejemplos_avanzados.py - Aprende con ejemplos
+
+================================================================================
+CONSEJOS PARA EL EXITO:
+================================================================================
+
+   * Ejecuta el analisis diariamente
+   * Combina con tu propio analisis
+   * No te bases solo en probabilidades
+   * Lee noticias de las empresas
+   * Aprende de cada operacion
+   * Manten un diario de trading
+   * Se paciente y disciplinado
+
+================================================================================
+LISTO PARA USAR!
+================================================================================
+
+   Tu proyecto esta completamente configurado y funcional.
+   
+   Siguiente paso: python inicio_rapido.py
+
+================================================================================
+                   Creado con dedicacion para traders inteligentes
+================================================================================
