@@ -9,14 +9,119 @@ Ajusta aquí todos los parámetros según tus preferencias
 
 # Define tus acciones favoritas aquí
 MIS_ACCIONES = [
+
+    # =========================
     # Tecnología
-    'TSLA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NVDA', 'AMD',
-    
-    # Puedes agregar más sectores:
-     'JPM', 'V', 'MA',        # Finanzas
-    # 'JNJ', 'PFE', 'UNH',     # Salud
-    # 'XOM', 'CVX',            # Energía
-    # 'WMT', 'HD', 'NKE',      # Retail
+    # =========================
+    'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NVDA', 'AMD', 'TSLA',
+    'INTC', 'IBM', 'ORCL', 'ADBE', 'CRM', 'CSCO', 'QCOM', 'AVGO',
+    'TXN', 'MU', 'SHOP', 'UBER', 'SNOW', 'PLTR', 'NET', 'SQ',
+
+    # =========================
+    # Finanzas
+    # =========================
+    'JPM', 'BAC', 'WFC', 'C', 'GS', 'MS', 'V', 'MA', 'AXP',
+    'BLK', 'SCHW', 'PYPL', 'COIN', 'USB', 'PNC', 'BK',
+
+    # =========================
+    # Salud / Farmacéuticas
+    # =========================
+    'JNJ', 'PFE', 'UNH', 'MRK', 'ABBV', 'TMO', 'ABT', 'LLY',
+    'BMY', 'AMGN', 'CVS', 'MDT', 'GILD', 'ISRG', 'VRTX',
+
+    # =========================
+    # Energía
+    # =========================
+    'XOM', 'CVX', 'COP', 'SLB', 'EOG', 'PSX', 'MPC', 'OXY',
+    'VLO', 'HAL', 'BP', 'SHEL',
+
+    # =========================
+    # Consumo / Retail
+    # =========================
+    'WMT', 'COST', 'HD', 'LOW', 'NKE', 'SBUX', 'MCD', 'TGT',
+    'DG', 'DLTR', 'ROST', 'TJX', 'BBY', 'EBAY', 'ETSY',
+
+    # =========================
+    # Automotriz
+    # =========================
+    'F', 'GM', 'RIVN', 'LCID', 'NIO', 'TM', 'HMC', 'STLA',
+
+    # =========================
+    # Telecomunicaciones
+    # =========================
+    'T', 'VZ', 'TMUS', 'CMCSA', 'CHTR',
+
+    # =========================
+    # Entretenimiento / Streaming
+    # =========================
+    'NFLX', 'DIS', 'ROKU', 'PARA', 'WBD', 'SPOT',
+
+    # =========================
+    # Aeroespacial / Defensa
+    # =========================
+    'BA', 'LMT', 'RTX', 'NOC', 'GD', 'LHX',
+
+    # =========================
+    # Industrial
+    # =========================
+    'CAT', 'DE', 'GE', 'MMM', 'HON', 'UPS', 'FDX', 'UNP',
+
+    # =========================
+    # Bienes Raíces / REITs
+    # =========================
+    'AMT', 'PLD', 'O', 'SPG', 'CCI', 'EQIX',
+
+    # =========================
+    # Cripto / Blockchain
+    # =========================
+    'MSTR', 'RIOT', 'MARA', 'HUT', 'CLSK',
+
+    # =========================
+    # ETFs populares
+    # =========================
+    'SPY', 'QQQ', 'DIA', 'IWM', 'VTI', 'VOO',
+    'ARKK', 'SOXX', 'XLF', 'XLK', 'XLE',
+
+    # =========================
+    # Dividendos / Estables
+    # =========================
+    'KO', 'PEP', 'PG', 'CL', 'KMB', 'MO', 'PM',
+
+    # =========================
+    # Bancos internacionales
+    # =========================
+    'HSBC', 'UBS', 'BCS', 'ING',
+
+    # =========================
+    # Latinoamérica
+    # =========================
+    'VALE', 'PBR', 'ITUB', 'BBD', 'CEMEX',
+
+    # =========================
+    # Inteligencia Artificial
+    # =========================
+    'AI', 'SOUN', 'BBAI', 'PATH', 'SYM',
+
+    # =========================
+    # Semiconductores
+    # =========================
+    'ASML', 'ARM', 'SMCI', 'ON', 'NXPI', 'LRCX', 'KLAC',
+
+    # =========================
+    # E-commerce / Internet
+    # =========================
+    'MELI', 'SE', 'BABA', 'JD', 'PDD',
+
+    # =========================
+    # Gaming
+    # =========================
+    'EA', 'TTWO', 'RBLX', 'U', 'SONY',
+
+    # =========================
+    # ETFs apalancados (volátiles)
+    # =========================
+    'TQQQ', 'SQQQ', 'SOXL', 'SOXS',
+
 ]
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -24,7 +129,7 @@ MIS_ACCIONES = [
 # ═══════════════════════════════════════════════════════════════════════════
 
 # Horizonte de predicción (días hacia adelante)
-HORIZONTE_DIAS = 15  # Valores comunes: 5, 10, 15, 30
+HORIZONTE_DIAS = 30  # Valores comunes: 5, 10, 15, 30
 
 # Período de datos históricos a analizar
 PERIODO_HISTORICO = "10y"  # Opciones: "1y", "2y", "5y", "10y", "max"
