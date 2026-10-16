@@ -186,6 +186,12 @@ GUARDAR_CSV = True
 # Nombre del archivo CSV
 NOMBRE_CSV = "mis_recomendaciones.csv"
 
+# Guardar cada recomendación en SQLite para evaluar el acierto al vencer el plazo
+GUARDAR_BD = True
+
+# Ruta de la base de datos (None = finance.db en la carpeta del proyecto)
+RUTA_BD = None  # ej: r"C:\laragon\www\Finance\finance.db"
+
 # Mostrar detalles completos o resumen
 MODO_DETALLADO = True  # False para resumen más corto
 
@@ -263,6 +269,9 @@ def mostrar_configuracion():
     print(f"   • Riesgo máximo: {RIESGO_MAXIMO}%")
     print(f"   • Retorno mínimo: {RETORNO_MINIMO}%")
     print(f"   • Muestras mínimas: {MUESTRAS_MINIMAS}")
+    print(f"\n💾 Persistencia:")
+    print(f"   • Guardar CSV: {GUARDAR_CSV} ({NOMBRE_CSV})")
+    print(f"   • Guardar BD:  {GUARDAR_BD} ({RUTA_BD or 'finance.db'})")
     
     if PERFIL_ACTIVO:
         print(f"\n👤 Perfil activo: {PERFIL_ACTIVO}")

@@ -19,8 +19,11 @@ def analizar_con_config():
     
     print("🔍 Iniciando análisis...\n")
     
-    # Crear recomendador
-    recommender = StockRecommender()
+    # Crear recomendador (con persistencia en BD si está activada)
+    recommender = StockRecommender(
+        save_to_db=getattr(config, "GUARDAR_BD", True),
+        db_path=getattr(config, "RUTA_BD", None),
+    )
     recommender.analyzer.period = config.PERIODO_HISTORICO
     
     # Analizar
@@ -66,9 +69,16 @@ def analizar_con_config():
         # Mostrar recomendaciones
         recommender.print_recommendations(signals_filtradas, config.HORIZONTE_DIAS)
         
-        # Guardar si está configurado
-        if config.GUARDAR_CSV and signals_filtradas:
-            recommender.export_to_csv(signals_filtradas, config.NOMBRE_CSV)
+        # Guardar CSV y/o BD según configuración
+        if signals_filtradas:
+            recommender.persist_results(
+                signals_filtradas,
+                horizon=config.HORIZONTE_DIAS,
+                csv_filename=config.NOMBRE_CSV if config.GUARDAR_CSV else None,
+                notes="analizar_personalizado",
+                save_csv=config.GUARDAR_CSV,
+                save_db=getattr(config, "GUARDAR_BD", True),
+            )
     
     else:
         print("\n❌ No se encontraron señales de compra en este momento.")

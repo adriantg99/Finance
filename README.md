@@ -120,8 +120,32 @@ mis_acciones = [
 ]
 ```
 
+## 🗄️ Seguimiento de recomendaciones (BD)
+
+Cada análisis guarda automáticamente las señales en **SQLite** (`finance.db`) con precio de entrada, métricas y plazo (`HORIZONTE_DIAS`). Al vencer el plazo puedes comparar con el precio real:
+
+```bash
+# Ver pendientes (aún no vencidas)
+python evaluar_recomendaciones.py --list
+
+# Evaluar las que ya cumplieron el plazo (compara precio actual)
+python evaluar_recomendaciones.py --evaluate
+
+# Historial de aciertos/fallos y precisión por estrategia
+python evaluar_recomendaciones.py --history
+python evaluar_recomendaciones.py --summary
+
+# Importar un CSV ya generado (ej. el de hoy con XLK a 30 días)
+python evaluar_recomendaciones.py --import-csv mis_recomendaciones.csv --horizon 30
+```
+
+Activa/desactiva en `config.py`:
+- `GUARDAR_BD = True`
+- `HORIZONTE_DIAS = 30`  ← plazo para la evaluación
+
 ## 📈 Archivos Generados
 
+- `finance.db` - Base SQLite con recomendaciones y resultados reales
 - `mis_recomendaciones.csv` - Resultados de buscar_acciones.py
 - `dashboard_signals.csv` - Resultados de dashboard.py
 - `recomendaciones.csv` - Resultados de stock_analyzer.py

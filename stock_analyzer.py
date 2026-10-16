@@ -189,8 +189,35 @@ class StockAnalyzer:
 class StockRecommender:
     """Generador de recomendaciones de compra"""
     
-    def __init__(self):
+    def __init__(self, save_to_db: bool = True, db_path: str = None):
         self.analyzer = StockAnalyzer()
+        self.save_to_db = save_to_db
+        self.db_path = db_path
+        self._store = None
+
+    def _get_store(self):
+        if self._store is None:
+            from database import RecommendationStore
+            self._store = RecommendationStore(db_path=self.db_path)
+        return self._store
+
+    @staticmethod
+    def classify_recommendation(probability: float, risk: float) -> str:
+        if probability >= 70 and risk < 10:
+            return "COMPRA FUERTE"
+        if probability >= 65 and risk < 15:
+            return "COMPRA MODERADA"
+        return "COMPRA CAUTELOSA"
+
+    @staticmethod
+    def _enrich_signal(signal: Dict, horizon: int) -> Dict:
+        enriched = dict(signal)
+        enriched['horizon_days'] = horizon
+        enriched['recommendation_level'] = StockRecommender.classify_recommendation(
+            float(signal.get('probability', 0)),
+            float(signal.get('risk', 0)),
+        )
+        return enriched
     
     def analyze_multiple_stocks(self, symbols: List[str], 
                                 horizon: int = 15) -> List[Dict]:
@@ -204,7 +231,8 @@ class StockRecommender:
             signals = self.analyzer.get_current_signals(symbol, horizon)
             
             if signals:
-                all_signals.extend(signals)
+                enriched = [self._enrich_signal(s, horizon) for s in signals]
+                all_signals.extend(enriched)
                 print(f"✓ {len(signals)} señal(es) encontrada(s)")
             else:
                 print("✗ Sin señales")
@@ -226,6 +254,10 @@ class StockRecommender:
         
         for i, signal in enumerate(signals, 1):
             color = self._get_color_by_probability(signal['probability'])
+            level = signal.get('recommendation_level') or self.classify_recommendation(
+                signal['probability'], signal['risk']
+            )
+            signal_horizon = signal.get('horizon_days', horizon)
             
             print(f"{i}. {signal['symbol']} - Estrategia: {signal['strategy']}")
             print(f"   {color}{'='*70}{self._reset()}")
@@ -233,7 +265,7 @@ class StockRecommender:
             message = (
                 f"   Según esta estrategia, {signal['symbol']} tiene "
                 f"{signal['probability']:.0f}% probabilidad histórica de subir "
-                f"en los próximos {horizon} días, con un riesgo del {signal['risk']:.1f}%."
+                f"en los próximos {signal_horizon} días, con un riesgo del {signal['risk']:.1f}%."
             )
             print(message)
             
@@ -243,16 +275,14 @@ class StockRecommender:
             print(f"      • Retorno promedio esperado: {signal['avg_return']:.2f}%")
             print(f"      • Pérdida máxima histórica: {signal['max_loss']:.2f}%")
             print(f"      • Muestras históricas: {signal['samples']}")
+            print(f"      • Plazo a evaluar: {signal_horizon} días")
             
-            # Recomendación
-            if signal['probability'] >= 70 and signal['risk'] < 10:
-                recommendation = "🟢 COMPRA FUERTE"
-            elif signal['probability'] >= 65 and signal['risk'] < 15:
-                recommendation = "🟡 COMPRA MODERADA"
-            else:
-                recommendation = "🟠 COMPRA CAUTELOSA"
-            
-            print(f"\n   {recommendation}\n")
+            emoji = {
+                "COMPRA FUERTE": "🟢",
+                "COMPRA MODERADA": "🟡",
+                "COMPRA CAUTELOSA": "🟠",
+            }.get(level, "🟠")
+            print(f"\n   {emoji} {level}\n")
         
         print("="*80 + "\n")
     
@@ -278,6 +308,46 @@ class StockRecommender:
         df = pd.DataFrame(signals)
         df.to_csv(filename, index=False)
         print(f"\n💾 Recomendaciones guardadas en: {filename}")
+
+    def save_to_database(
+        self,
+        signals: List[Dict],
+        horizon: int = 15,
+        notes: str = None,
+    ) -> Dict:
+        """Persiste señales en SQLite para compararlas al vencer el plazo."""
+        if not signals:
+            print("No hay señales para guardar en la base de datos.")
+            return {"inserted": 0, "skipped": 0}
+
+        store = self._get_store()
+        stats = store.save_recommendations(signals, horizon_days=horizon, notes=notes)
+        print(
+            f"🗄️  BD ({store.db_path.name}): "
+            f"{stats['inserted']} nuevas, {stats['skipped']} ya existían hoy. "
+            f"Se evaluarán en {horizon} días."
+        )
+        return stats
+
+    def persist_results(
+        self,
+        signals: List[Dict],
+        horizon: int = 15,
+        csv_filename: str = None,
+        notes: str = None,
+        save_csv: bool = True,
+        save_db: bool = None,
+    ) -> None:
+        """Guarda CSV y/o base de datos según configuración."""
+        if not signals:
+            return
+
+        if save_csv and csv_filename:
+            self.export_to_csv(signals, csv_filename)
+
+        should_save_db = self.save_to_db if save_db is None else save_db
+        if should_save_db:
+            self.save_to_database(signals, horizon=horizon, notes=notes)
 
 
 def main():
@@ -306,9 +376,14 @@ def main():
     # Mostrar recomendaciones
     recommender.print_recommendations(signals, horizon)
     
-    # Exportar a CSV
+    # Exportar a CSV y base de datos
     if signals:
-        recommender.export_to_csv(signals)
+        recommender.persist_results(
+            signals,
+            horizon=horizon,
+            csv_filename="recomendaciones.csv",
+            notes="stock_analyzer.main",
+        )
 
 
 if __name__ == "__main__":

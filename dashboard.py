@@ -32,8 +32,18 @@ def print_dashboard():
     
     print(f"🔍 Escaneando {len(symbols)} acciones...\n")
     
-    recommender = StockRecommender()
-    signals = recommender.analyze_multiple_stocks(symbols, horizon=15)
+    try:
+        import config
+        horizon = getattr(config, "HORIZONTE_DIAS", 30)
+        save_db = getattr(config, "GUARDAR_BD", True)
+        db_path = getattr(config, "RUTA_BD", None)
+    except ImportError:
+        horizon = 30
+        save_db = True
+        db_path = None
+
+    recommender = StockRecommender(save_to_db=save_db, db_path=db_path)
+    signals = recommender.analyze_multiple_stocks(symbols, horizon=horizon)
     
     if not signals:
         print("┌" + "─"*78 + "┐")
@@ -103,11 +113,16 @@ def print_dashboard():
               f"Mejor: {best['probability']:.0f}% prob, {best['risk']:.1f}% riesgo")
     
     print("\n" + "─"*80)
-    print("💾 Detalles completos guardados en: mis_recomendaciones.csv")
+    print("💾 Detalles completos en CSV + BD (finance.db)")
     print("─"*80 + "\n")
     
-    # Guardar
-    recommender.export_to_csv(signals, "dashboard_signals.csv")
+    # Guardar CSV + base de datos para seguimiento del acierto
+    recommender.persist_results(
+        signals,
+        horizon=horizon,
+        csv_filename="dashboard_signals.csv",
+        notes="dashboard",
+    )
 
 
 if __name__ == "__main__":
