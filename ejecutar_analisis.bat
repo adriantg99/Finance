@@ -10,8 +10,8 @@ echo.
 echo Ejecutando analisis rapido...
 echo.
 
-cd /d "C:\laragon\www\Finance"
-C:\laragon\www\scripts\.venv\Scripts\python.exe buscar_acciones.py
+cd /d "%~dp0"
+".venv\Scripts\python.exe" buscar_acciones.py
 
 echo.
 echo ========================================================================

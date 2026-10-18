@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mi portafolio · Finance</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+<script src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div>
+      <div class="brand">📈 Finance</div>
+      <div class="tiny muted">Seguimiento de las acciones en las que decidiste invertir</div>
+    </div>
+    <div class="top-actions">
+      <span class="tiny muted" id="lastUpdate"></span>
+      <button class="btn" id="refreshBtn" title="Vuelve a descargar los precios actuales">⟳ Actualizar precios</button>
+      {% if has_password %}<a class="btn btn-ghost" href="{{ url_for('logout') }}">Salir</a>{% endif %}
+    </div>
+  </div>
+  <nav class="wrap tabs" role="tablist">
+    <button class="tab active" data-tab="inv">💼 Mis inversiones</button>
+    <button class="tab" data-tab="recs">🔎 Recomendaciones del analizador</button>
+    <button class="tab" data-tab="glos">📖 Glosario</button>
+    <button class="tab" data-tab="help">❓ Cómo usar</button>
+  </nav>
+</header>
+
+<main class="wrap">
+
+<!-- ═══════════════ MIS INVERSIONES ═══════════════ -->
+<section id="tab-inv" class="tab-panel active">
+  <div class="explain">
+    <strong>¿Qué es esta pantalla?</strong> Aquí aparecen solo las acciones que <em>tú</em> marcaste como
+    "invertí en esta". Al marcarla se guarda el <b>precio de ese momento</b> (precio de entrada). Cada vez que
+    abres o actualizas esta página se descarga el <b>precio actual</b> y se calcula cuánto vas
+    <span class="good">ganando</span> o <span class="bad">perdiendo</span> desde que la señalaste.
+    Pasa el cursor (o toca) los <span class="help-inline">?</span> para ver qué significa cada dato.
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="section-head">
+    <h2>Inversiones abiertas <span class="help" data-term="abierta">?</span></h2>
+    <button class="btn btn-primary" id="addManualBtn">+ Agregar inversión manualmente</button>
+  </div>
+  <p class="muted small">Ordenadas de la más reciente a la más antigua. Toca "Ver gráfica y detalles" para ver cómo se ha movido el precio desde que la señalaste.</p>
+  <div id="openList" class="inv-list"></div>
+
+  <div class="section-head">
+    <h2>Inversiones cerradas (ya vendidas) <span class="help" data-term="cerrada">?</span></h2>
+  </div>
+  <p class="muted small">Cuando vendes, presiona "Cerrar (ya vendí)" en la inversión: el resultado se congela con el precio de venta y deja de cambiar.</p>
+  <div id="closedList" class="inv-list"></div>
+</section>
+
+<!-- ═══════════════ RECOMENDACIONES ═══════════════ -->
+<section id="tab-recs" class="tab-panel">
+  <div class="explain">
+    <strong>¿Qué es esta pantalla?</strong> Son las <b>señales de compra</b> que generó el analizador
+    (scripts como <code>buscar_acciones.py</code>, <code>dashboard.py</code> o el botón de abajo). Cada fila dice:
+    "según la estrategia X, históricamente esta acción subió en el Y% de los casos en los siguientes
+    {{ horizonte }} días". <b>No son órdenes de compra</b>: tú decides. Si decides invertir en una, presiona
+    <b>"Invertí en esta"</b> y pasará a "Mis inversiones" para darle seguimiento.
+  </div>
+
+  <div class="card">
+    <h3>Generar nuevas recomendaciones</h3>
+    <p class="small muted">Descarga datos históricos de Yahoo Finance, aplica las 5 estrategias y guarda las señales nuevas.
+      También evalúa las recomendaciones cuyo plazo ya venció. Puedes cerrar la página: el análisis sigue corriendo en el servidor.</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="runQuick">▶ Análisis rápido (8 acciones · ~1 min)</button>
+      <button class="btn" id="runFull">▶ Análisis completo (todas las de config.py · 10–25 min)</button>
+      <button class="btn btn-ghost" id="evalBtn" title="Compara el precio actual con el de la señal para las que ya cumplieron su plazo">✔ Evaluar recomendaciones vencidas</button>
+    </div>
+    <pre id="jobLog" class="log hidden"></pre>
+  </div>
+
+  <div class="summary" id="recSummary"></div>
+
+  <div class="filters">
+    <label>Mostrar:
+      <select id="recFilter">
+        <option value="pending">Pendientes (aún dentro del plazo)</option>
+        <option value="evaluated">Evaluadas (plazo vencido, con resultado)</option>
+        <option value="all">Todas</option>
+      </select>
+    </label>
+    <label>Buscar símbolo: <input id="recSearch" placeholder="ej. AAPL" size="8"></label>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table" id="recTable">
+      <thead><tr>
+        <th>Fecha <span class="help" data-term="fecha_rec">?</span></th>
+        <th>Símbolo <span class="help" data-term="simbolo">?</span></th>
+        <th>Estrategia <span class="help" data-term="estrategia">?</span></th>
+        <th>Nivel <span class="help" data-term="nivel">?</span></th>
+        <th class="num">Probabilidad <span class="help" data-term="probabilidad">?</span></th>
+        <th class="num">Riesgo <span class="help" data-term="riesgo">?</span></th>
+        <th class="num">Retorno prom. <span class="help" data-term="retorno_promedio">?</span></th>
+        <th class="num">Pérdida máx. <span class="help" data-term="perdida_maxima">?</span></th>
+        <th class="num">Muestras <span class="help" data-term="muestras">?</span></th>
+        <th class="num">RSI <span class="help" data-term="rsi">?</span></th>
+        <th class="num">Precio señal <span class="help" data-term="precio_senal">?</span></th>
+        <th>Se evalúa <span class="help" data-term="fecha_evaluacion">?</span></th>
+        <th>Resultado <span class="help" data-term="resultado">?</span></th>
+        <th></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ GLOSARIO ═══════════════ -->
+<section id="tab-glos" class="tab-panel">
+  <div class="explain">
+    <strong>Glosario.</strong> Todos los términos que ves en la aplicación, explicados en lenguaje sencillo.
+    Usa el buscador para encontrar uno rápido.
+  </div>
+  <input id="glosSearch" class="glos-search" placeholder="Buscar término… (ej. RSI, riesgo, Bollinger)">
+  <div id="glossary"></div>
+</section>
+
+<!-- ═══════════════ CÓMO USAR ═══════════════ -->
+<section id="tab-help" class="tab-panel">
+  <div class="card prose">
+    <h2>Cómo usar esta aplicación</h2>
+    <ol>
+      <li><b>Genera recomendaciones.</b> En la pestaña <i>Recomendaciones del analizador</i> presiona
+        "Análisis rápido" o "Análisis completo" (o ejecuta los scripts de Python como siempre). Las señales se guardan en <code>finance.db</code>.</li>
+      <li><b>Revisa las señales.</b> Fíjate en la <i>probabilidad</i>, el <i>riesgo</i>, la <i>pérdida máxima</i> y cuántas
+        <i>muestras</i> hay. Más muestras = estadística más confiable.</li>
+      <li><b>Si decides invertir</b> (en tu broker, fuera de esta app), presiona <b>"Invertí en esta"</b>. Puedes indicar cuántas
+        acciones compraste o cuánto dinero pusiste, y el precio real al que compraste. Si dejas el precio vacío se usa el precio del mercado en ese momento.</li>
+      <li><b>Consulta tu progreso</b> en <i>Mis inversiones</i> cuando quieras: verás el precio al que la señalaste, el precio actual,
+        el % y los $ que vas ganando o perdiendo, y una gráfica desde ese día.</li>
+      <li><b>Cuando vendas</b>, presiona "Cerrar (ya vendí)" y escribe el precio de venta para guardar el resultado final.</li>
+      <li>¿Compraste algo que no salió del analizador? Usa <b>"+ Agregar inversión manualmente"</b> con cualquier símbolo de Yahoo Finance (ej. <code>AAPL</code>, <code>VOO</code>, <code>WALMEX.MX</code>).</li>
+    </ol>
+    <h3>Importante</h3>
+    <ul>
+      <li>Esta app <b>no compra ni vende nada</b>: solo registra lo que tú le dices y consulta precios.</li>
+      <li>Los precios vienen de Yahoo Finance y pueden tener <b>retraso de hasta 15 minutos</b>. Fuera del horario del mercado
+        (lunes a viernes, 9:30–16:00 hora de Nueva York) verás el último precio de cierre.</li>
+      <li>Las ganancias mostradas <b>no restan comisiones del broker ni impuestos</b>.</li>
+      <li>Las probabilidades son <b>históricas</b>: describen lo que pasó en el pasado, no garantizan el futuro. No es asesoría financiera.</li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<!-- ═══════════════ MODAL: AGREGAR INVERSIÓN ═══════════════ -->
+<div class="modal hidden" id="addModal" role="dialog" aria-modal="true">
+  <form class="modal-card" id="addForm">
+    <h2 id="addTitle">Registrar inversión</h2>
+    <p class="small muted" id="addSubtitle">Se guardará el momento actual como fecha en que señalaste la acción.</p>
+    <input type="hidden" name="recommendation_id">
+
+    <label>Símbolo de la acción <span class="help" data-term="simbolo">?</span>
+      <input name="symbol" required placeholder="ej. AAPL" autocomplete="off">
+    </label>
+    <div class="price-preview small" id="pricePreview"></div>
+
+    <fieldset>
+      <legend>¿Cuánto invertiste? <span class="tiny muted">(opcional; llena solo uno)</span></legend>
+      <p class="tiny muted">Si lo llenas verás tu ganancia/pérdida en dólares. Si lo dejas vacío solo verás el % de cambio.</p>
+      <div class="two">
+        <label>Número de acciones <span class="help" data-term="acciones">?</span>
+          <input name="shares" inputmode="decimal" placeholder="ej. 3 o 0.5">
+        </label>
+        <label>o Dinero invertido (USD) <span class="help" data-term="dinero_invertido">?</span>
+          <input name="amount" inputmode="decimal" placeholder="ej. 500">
+        </label>
+      </div>
+    </fieldset>
+
+    <label>Precio al que compraste (USD) <span class="help" data-term="precio_entrada">?</span>
+      <input name="entry_price" inputmode="decimal" placeholder="Vacío = precio actual del mercado">
+    </label>
+    <label>Notas (opcional)
+      <textarea name="notes" rows="2" placeholder="ej. Compré en GBM, objetivo +8%, stop-loss -5%"></textarea>
+    </label>
+    <div class="alert alert-bad hidden" id="addError"></div>
+    <div class="btn-row end">
+      <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
+      <button type="submit" class="btn btn-primary">Guardar inversión</button>
+    </div>
+  </form>
+</div>
+
+<!-- ═══════════════ MODAL: CERRAR ═══════════════ -->
+<div class="modal hidden" id="closeModal" role="dialog" aria-modal="true">
+  <form class="modal-card" id="closeForm">
+    <h2>Cerrar inversión (ya vendí)</h2>
+    <p class="small muted">El resultado quedará fijo con este precio de venta y la inversión pasará a "cerradas".</p>
+    <input type="hidden" name="id">
+    <label>Precio al que vendiste (USD) <span class="help" data-term="precio_salida">?</span>
+      <input name="exit_price" inputmode="decimal" placeholder="Vacío = precio actual del mercado">
+    </label>
+    <div class="alert alert-bad hidden" id="closeError"></div>
+    <div class="btn-row end">
+      <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
+      <button type="submit" class="btn btn-primary">Cerrar inversión</button>
+    </div>
+  </form>
+</div>
+
+<div id="tip" class="tip hidden" role="tooltip"></div>
+<div id="toast" class="toast hidden"></div>
+
+<script>window.HORIZONTE = {{ horizonte|int }};</script>
+<script src="{{ url_for('static', filename='glossary.js') }}"></script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

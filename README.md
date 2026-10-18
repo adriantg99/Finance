@@ -15,6 +15,18 @@ cd C:\laragon\www\Finance
 python buscar_acciones.py
 ```
 
+## 🌐 Interfaz web (nuevo)
+
+Panel en el navegador para ver las recomendaciones, **marcar en cuáles invertiste** y ver en todo momento
+cuánto vas ganando o perdiendo desde que la señalaste, con gráfica y glosario de cada término.
+
+```powershell
+.\instalar_windows.bat   # solo la primera vez
+.\iniciar_web.bat        # abre http://127.0.0.1:5000
+```
+
+Para dejarla encendida en un servidor Ubuntu (GCP) y consultarla desde cualquier lugar, sigue **[DESPLIEGUE.md](DESPLIEGUE.md)**.
+
 ## 📁 Archivos Principales
 
 | Archivo | Descripción | Uso |

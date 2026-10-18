@@ -10,8 +10,8 @@ echo.
 echo Ejecutando dashboard completo (esto puede tardar 3-5 minutos)...
 echo.
 
-cd /d "C:\laragon\www\Finance"
-C:\laragon\www\scripts\.venv\Scripts\python.exe dashboard.py
+cd /d "%~dp0"
+".venv\Scripts\python.exe" dashboard.py
 
 echo.
 echo ========================================================================
